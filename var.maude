@@ -1,0 +1,9 @@
+fmod VAR is
+
+  pr NAT .
+
+  sort Var .
+
+  op v : Nat -> Var [ctor] . 
+
+endfm

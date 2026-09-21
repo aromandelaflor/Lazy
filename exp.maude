@@ -1,0 +1,78 @@
+fmod EXP is
+
+  pr VAR .
+  pr INT .
+
+  sorts Exp Assign Op Code LambdaA NormalForm .
+  subsort Var Int LambdaA < Exp .
+  subsort Exp Assign < Code .
+  subsort LambdaA Int < NormalForm .
+
+  op _:=_ : Var Exp -> Assign [ctor] .
+  op _,_ : Assign Assign -> Assign [assoc comm ctor] . 
+
+  op lambda : Var Exp -> LambdaA [ctor] .
+  op __ : Exp Var -> Exp [ctor] .
+  op let_in_ : Assign Exp -> Exp [ctor] .
+  op ___ : Exp Op Exp -> Exp [ctor] .
+
+  op +. : -> Op [ctor] .
+
+  vars I : Int .
+  vars E E' : Exp .
+  vars V V' V'' : Var .
+  vars O : Op .
+  vars N N' : Nat .
+  vars A A' : Assign .
+
+  *** Substitution
+
+  op _[_/_] : Exp Var Var -> Exp .
+
+  eq [int] : I [V' / V] = I .
+  eq [var1] : V [V' / V] = V' .
+  eq [var2] : V'' [V' / V] = V'' .
+
+  eq [app1] : (E V) [V / V'] = (E [V / V']) . 
+  eq [app2] : (E V') [V / V'] = (E [V / V']) V' .
+  ceq [app3] : (E V'') [V / V'] = (E [V / V']) V''
+    if V'' =/= V' /\ V'' =/= V . 
+
+  eq [comp] : (E O E') [V' / V] = (E [V' / V]) O (E' [V' / V]) .  
+
+  ceq [lambda1] : lambda(V'', E) [V' / V] = lambda(V'', E [V' / V])
+    if V'' =/= V' /\ V'' =/= V . 
+
+  eq [lambda2] : lambda(V, E) [V / V'] = lambda(fresh(V, E), E [fresh(V, E) / V]) [V / V'] .
+
+  eq [lambda3] : lambda(V, E) [V' / V] = lambda(fresh(V, E), E [fresh(V, E) / V]) [V' / V] .
+
+  *** For getting fresh variables
+
+  op next : Code -> Nat .
+
+  eq [next1] : next(I) = 0 .
+  eq [next2] : next(v(N)) = N + 1 .
+  ceq [next3] : next(lambda(v(N), E)) = N + 1 if N >= next(E) .
+  ceq [next4] : next(lambda(v(N), E)) = next(E) if N < next(E) .
+  ceq [next5] : next(E v(N)) = N + 1 if N >= next(E) .
+  ceq [next6] : next(E v(N)) = next(E) if N < next(E) .
+  ceq [next7] : next(E O E') = next(E) if next(E) >= next(E') .
+  ceq [next8] : next(E O E') = next(E') if next(E) < next(E') .
+  ceq [next9] : next(let A in E) = next(A) if next(A) >= next(E) .
+  ceq [next10] : next(let A in E) = next(E) if next(A) < next(E) .  
+  eq [next11] : next(v(N) := I) = next(v(N)) .
+  ceq [next12] : next(v(N) := I , A) = next(v(N)) if next(v(N)) >= next(A) .
+  ceq [next13] : next(v(N) := I , A) = next(A) if next(v(N)) < next(A) .
+ 
+
+  op fresh : Var Code -> Var .
+
+  ceq [fresh1] : fresh(v(N), E) = v(N + 1)
+    if N >= next(E) .
+
+  ceq [fresh2] : fresh(v(N), E) = v(next(E)) 
+    if N < next(E) .
+
+  
+endfm

@@ -1,0 +1,51 @@
+mod SEMANTIC is
+
+  pr HEAP .
+  pr EXP .
+  
+  sorts Conf .
+
+  op <_,_> : Heap Exp -> Conf [ctor] .
+
+  vars H H' H'' : Heap .
+  vars V V' : Var .
+  vars E E' : Exp .
+  vars I I' : Int .
+  vars A : Assign .
+  vars F : NormalForm . 
+
+  crl [var] : 
+    < H [V := E] , V > => < H' [V := F] , F >
+    if < H , E > => < H' , F > .
+
+  crl [app] :
+    < H , E V > => < H'' , F >
+    if < H , E > => < H' , lambda(V', E') > /\
+      < H' , E' [V / V'] > => < H'' , F > .
+
+  crl [let] : 
+    < H , let A in E > => < H' , F > 
+    if < bind(H, A) , E > => < H' , F > .
+
+  crl [sum] : 
+    < H , E +. E' > => < H'' , I + I' >
+    if < H , E > => < H' , I > /\ < H' , E' > => < H'' , I' > .
+
+
+  op op1 : -> Conf .
+  eq op1 = < emptyHeap , let ((v(0) := (3 +. 2)) , (v(1) := (v(0) +. 1))) in (v(1) +. v(1)) > .
+
+  op op2 : -> Conf .
+  eq op2 = < [v(0) := 2] [v(1) := 3] ,
+
+    let (
+
+    (v(2) := (3 +. 2)) , 
+
+    (v(4) := (let (v(5) := (v(2) +. 1)) in (lambda(v(6), v(5) +. v(6)))))
+
+    ) in 
+
+    ((v(4) v(0)) +. (v(4) v(1))) > .
+
+endm

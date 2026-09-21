@@ -1,0 +1,42 @@
+fmod HEAP is
+
+  pr VAR .
+  pr EXP .
+  pr INT .
+
+  sort Heap .
+  
+  op emptyHeap : -> Heap [ctor] .
+  op [_:=_] : Var Exp -> Heap [ctor] .
+  op __ : Heap Heap -> Heap [ctor assoc comm id: emptyHeap] .
+
+  vars H : Heap .
+  vars V : Var .
+  vars E E' : Exp .
+  vars I I' : Int .
+  vars A : Assign .
+
+  *** We are not going to include an operation for erasing elements
+  *** at the moment
+
+  eq (H [V := E]) [V := E'] = H [V := E] .
+
+  *** Consult a binding (not defined when the variable does not exist)
+  ***op fetch : Heap Var ~> Exp .
+  ***eq fetch(H [V := E], V) = E .
+  
+  *** Update a binding
+  op _[_|->_] : Heap Var Exp -> Heap .
+  eq (H [V := E]) [V |-> E'] = H [V := E'] .
+  eq H [V |-> E] = H [owise] .
+
+  op bind : Heap Assign -> Heap .
+
+  eq bind(H, V := E) = H [V := E] .
+  eq bind(H, ((V := E) , A)) = bind(H [V := E], A) .
+
+  *** Extend the heap. Assuming no name colision exist. 
+  *** We can delegate it to the ctor operation
+  
+
+endfm
