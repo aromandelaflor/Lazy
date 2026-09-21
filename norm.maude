@@ -1,0 +1,45 @@
+fmod NORM is
+
+  pr EXP .
+  pr NAT .
+  pr VAR .
+
+  sort NormRes .
+
+  op <_,_> : Exp Nat -> NormRes [ctor] . 
+
+  vars E E' E'' E''' : Exp .
+  vars N N' N'' : Nat .
+  vars V : Var .
+  vars A A' A'' A''' : Assign .
+  vars I : Int .
+
+  op norm : Code Nat -> NormRes . 
+
+  ceq norm(lambda(V, E), N) = < lambda(V, E') , N' >
+    if < E' , N' > := norm(E, N) . 
+
+  eq norm(V, N) = < V , N > .
+  
+  ceq norm(let A in E, N) = < let A' in E' , N'' >
+    if < A' , N' > := norm(A, N) /\ < E' , N'' > := norm(E, N') .
+
+  ceq norm(V := E, N) = < V := E' , N' >
+    if < E' , N' > := norm(E, N) .
+
+  ceq norm((A , A'), N) = < (A'' , A''') , N'' >
+    if < A'' , N' > := norm(A, N) /\ < A''' , N'' > := norm(A', N') . 
+
+  ceq norm(E E', N) = < E'' E' , N' >
+    if (E' :: Var)
+    /\ < E'' , N' > := norm(E, N) .
+
+  ceq norm(E E', N) = < let v(N'') := E''' in (E'' v(N'')) , N'' + 1 >
+    if not (E' :: Var)
+    /\ < E'' , N' > := norm(E, N)
+    /\ < E''' , N'' > := norm(E', N') .
+
+  eq norm(E +. E', N) = < E +. E' , N > .
+  eq norm(I, N) = < I , N > .
+
+endfm

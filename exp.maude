@@ -12,7 +12,7 @@ fmod EXP is
   op _,_ : Assign Assign -> Assign [assoc comm ctor] . 
 
   op lambda : Var Exp -> LambdaA [ctor] .
-  op __ : Exp Var -> Exp [ctor] .
+  op __ : Exp Exp -> Exp [ctor] .
   op let_in_ : Assign Exp -> Exp [ctor] .
   op ___ : Exp Op Exp -> Exp [ctor] .
 
@@ -39,8 +39,6 @@ fmod EXP is
     if V'' =/= V' /\ V'' =/= V . 
 
   eq [comp] : (E O E') [V' / V] = (E [V' / V]) O (E' [V' / V]) .  
-
-
 
   ***(ceq [lambda1] : lambda(V'', E) [V' / V] = lambda(V'', E [V' / V])
     if V'' =/= V' /\ V'' =/= V . 
