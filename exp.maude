@@ -40,6 +40,15 @@ fmod EXP is
 
   eq [comp] : (E O E') [V' / V] = (E [V' / V]) O (E' [V' / V]) .  
 
+
+
+  
+
+
+
+
+  *** There might be a better approach to this (alpha-conversion)
+
   ***(ceq [lambda1] : lambda(V'', E) [V' / V] = lambda(V'', E [V' / V])
     if V'' =/= V' /\ V'' =/= V . 
 
