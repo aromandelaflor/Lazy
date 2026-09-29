@@ -41,49 +41,50 @@ fmod EXP is
   eq [comp] : (E O E') [V' / V] = (E [V' / V]) O (E' [V' / V]) .  
 
 
-
-  
-
-
-
-
-  *** There might be a better approach to this (alpha-conversion)
-
-  ***(ceq [lambda1] : lambda(V'', E) [V' / V] = lambda(V'', E [V' / V])
+  ceq [lambda1] : 
+  lambda(V'', E) [V' / V] = lambda(V'', E [V' / V])
     if V'' =/= V' /\ V'' =/= V . 
 
-  eq [lambda2] : lambda(V, E) [V / V'] = lambda(fresh(V, E), E [fresh(V, E) / V]) [V / V'] .
+  ceq [lambda2] : 
+    lambda(V, E) [V / V'] = lambda(V'', E [V'' / V]) [V / V']
+      if V'' := fresh(V, E) .
 
-  eq [lambda3] : lambda(V, E) [V' / V] = lambda(fresh(V, E), E [fresh(V, E) / V]) [V' / V] .
-  )
+  ceq [lambda3] : 
+    lambda(V, E) [V' / V] = lambda(V'', E [V'' / V]) [V' / V]
+      if V'' := fresh(V, E) .
 
-  *** For getting fresh variables. It is just a POC, so it is not used yet.
-  ***(
 
   op next : Code -> Nat .
 
   eq [next1] : next(I) = 0 .
-  eq [next2] : next(v(N)) = N + 1 .
+  eq [next2] : next(v(N)) = s(N) .
   ceq [next3] : next(lambda(v(N), E)) = N + 1 if N >= next(E) .
   ceq [next4] : next(lambda(v(N), E)) = next(E) if N < next(E) .
-  ceq [next5] : next(E v(N)) = N + 1 if N >= next(E) .
+  ceq [next5] : next(E v(N)) = s(N) if N >= next(E) .
   ceq [next6] : next(E v(N)) = next(E) if N < next(E) .
   ceq [next7] : next(E O E') = next(E) if next(E) >= next(E') .
   ceq [next8] : next(E O E') = next(E') if next(E) < next(E') .
   ceq [next9] : next(let A in E) = next(A) if next(A) >= next(E) .
   ceq [next10] : next(let A in E) = next(E) if next(A) < next(E) .  
-  eq [next11] : next(v(N) := I) = next(v(N)) .
+
+  ceq [next11] : next(v(N) := E) = N'
+    if N' := next(v(N)) /\ N' >= next(E) .
+
+  ceq [next12] : next(v(N) := E) = N'
+    if N' := next(E) /\ N' > next(v(N)) .
+
+  *** PENDING
+
   ceq [next12] : next(v(N) := I , A) = next(v(N)) if next(v(N)) >= next(A) .
   ceq [next13] : next(v(N) := I , A) = next(A) if next(v(N)) < next(A) .
  
 
   op fresh : Var Code -> Var .
 
-  ceq [fresh1] : fresh(v(N), E) = v(N + 1)
+  ceq [fresh1] : fresh(v(N), E) = v(s(N))
     if N >= next(E) .
 
   ceq [fresh2] : fresh(v(N), E) = v(next(E)) 
     if N < next(E) .
-)
   
 endfm

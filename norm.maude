@@ -34,7 +34,7 @@ fmod NORM is
     if (E' :: Var)
     /\ < E'' , N' > := norm(E, N) .
 
-  ceq norm(E E', N) = < let v(N'') := E''' in (E'' v(N'')) , N'' + 1 >
+  ceq norm(E E', N) = < let v(N'') := E''' in (E'' v(N'')) , s(N'') >
     if not (E' :: Var)
     /\ < E'' , N' > := norm(E, N)
     /\ < E''' , N'' > := norm(E', N') .

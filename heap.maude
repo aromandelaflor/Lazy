@@ -7,6 +7,7 @@ fmod HEAP is
   sort Heap .
   
   op emptyHeap : -> Heap [ctor] .
+  op errorHeap : -> Heap [ctor] .
   op [_:=_] : Var Exp -> Heap [ctor] .
   op __ : Heap Heap -> Heap [ctor assoc comm id: emptyHeap] .
 
@@ -19,7 +20,8 @@ fmod HEAP is
   *** We are not going to include an operation for erasing elements
   *** at the moment
 
-  eq (H [V := E]) [V := E'] = H [V := E] .
+  eq H [V := E] [V := E'] = errorHeap .
+  eq errorHeap H [V := E] = errorHeap .
 
   *** Consult a binding (not defined when the variable does not exist)
   ***op fetch : Heap Var ~> Exp .
