@@ -73,10 +73,11 @@ fmod EXP is
   ceq [next12] : next(v(N) := E) = N'
     if N' := next(E) /\ N' > next(v(N)) .
 
-  *** PENDING
+  ceq [next12] : next(v(N) := E , A) = N'
+    if N' := next(v(N)) /\ N' >= next(A) .
 
-  ceq [next12] : next(v(N) := I , A) = next(v(N)) if next(v(N)) >= next(A) .
-  ceq [next13] : next(v(N) := I , A) = next(A) if next(v(N)) < next(A) .
+  ceq [next13] : next(v(N) := I , A) = N' 
+    if N' := next(A) /\ next(v(N)) < N' .
  
 
   op fresh : Var Code -> Var .

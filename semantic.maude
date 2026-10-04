@@ -2,10 +2,13 @@ mod SEMANTIC is
 
   pr HEAP .
   pr EXP .
+  pr NORM .
   
   sorts Conf .
 
   op <_,_> : Heap Exp -> Conf [ctor] .
+  op exec : Exp -> Conf .
+
 
   vars H H' H'' : Heap .
   vars V V' : Var .
@@ -13,6 +16,11 @@ mod SEMANTIC is
   vars I I' : Int .
   vars A : Assign .
   vars F : NormalForm . 
+  vars N : Nat .
+  
+  ceq [exec] : 
+    exec(E) = < emptyHeap, E' >
+      if < E' , N > := norm(E, 0) .
 
   crl [var] : 
     < H [V := E] , V > => < H' [V := F] , F >
