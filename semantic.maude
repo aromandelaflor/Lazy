@@ -28,7 +28,7 @@ mod SEMANTIC is
 
   crl [app] :
     < H , E V > => < H'' , F >
-    if < H , E > => < H' , lambda(V', E') > /\
+    if < H , E > => < H' , lambda V' . E' > /\
       < H' , E' [V / V'] > => < H'' , F > .
 
   crl [let] : 
@@ -50,10 +50,19 @@ mod SEMANTIC is
 
     (v(2) := (3 +. 2)) , 
 
-    (v(4) := (let (v(5) := (v(2) +. 1)) in (lambda(v(6), v(5) +. v(6)))))
+    (v(4) := (let (v(5) := (v(2) +. 1)) in (lambda v(6) . (v(5) +. v(6)))))
 
     ) in 
 
     ((v(4) v(0)) +. (v(4) v(1))) > .
 
+  op op3 : -> Conf .
+  eq op3 = 
+    < [v(0) := 1] [v(1) := 2] , let v(2) := (
+
+      lambda v(0) . (let v(3) := v(0) in v(3))
+
+    ) in ((v(2) v(0)) +. (v(2) v(1))) > .
+
+    ***) in (v(2) v(1)) > .
 endm

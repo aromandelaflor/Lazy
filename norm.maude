@@ -16,7 +16,7 @@ fmod NORM is
 
   op norm : Code Nat -> NormRes . 
 
-  ceq norm(lambda(V, E), N) = < lambda(V, E') , N' >
+  ceq norm(lambda V . E, N) = < lambda V . E' , N' >
     if < E' , N' > := norm(E, N) . 
 
   eq norm(V, N) = < V , N > .

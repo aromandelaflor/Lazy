@@ -36,9 +36,6 @@ fmod HEAP is
 
   eq bind(H, V := E) = H [V := E] .
   eq bind(H, ((V := E) , A)) = bind(H [V := E], A) .
-
-  *** Extend the heap. Assuming no name colision exist. 
-  *** We can delegate it to the ctor operation
-  
+ 
 
 endfm

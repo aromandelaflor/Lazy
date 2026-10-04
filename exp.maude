@@ -8,10 +8,11 @@ fmod EXP is
   subsort Exp Assign < Code .
   subsort LambdaA Int < NormalForm .
 
+  op nullAssign : -> Assign [ctor] .
   op _:=_ : Var Exp -> Assign [ctor] .
-  op _,_ : Assign Assign -> Assign [assoc comm ctor] . 
+  op _,_ : Assign Assign -> Assign [assoc comm ctor id: nullAssign] . 
 
-  op lambda : Var Exp -> LambdaA [ctor] .
+  op lambda_._ : Var Exp -> LambdaA [ctor] .
   op __ : Exp Exp -> Exp [ctor] .
   op let_in_ : Assign Exp -> Exp [ctor] .
   op ___ : Exp Op Exp -> Exp [ctor] .
@@ -33,6 +34,15 @@ fmod EXP is
   eq [var1] : V [V' / V] = V' .
   eq [var2] : V'' [V' / V] = V'' .
 
+  eq [assign1] : 
+    (V := E) [V' / V''] = (V [V' / V'']) := (E [V' / V'']) .
+
+  eq [assign2] : 
+    (A , A') [V / V'] = (A [V / V']) , (A' [V / V']) .
+
+  eq [let1] : 
+    (let A in E) [V / V'] = let (A [V / V']) in (E [V / V']) .
+
   eq [app1] : (E V) [V / V'] = (E [V / V']) . 
   eq [app2] : (E V') [V / V'] = (E [V / V']) V' .
   ceq [app3] : (E V'') [V / V'] = (E [V / V']) V''
@@ -40,17 +50,16 @@ fmod EXP is
 
   eq [comp] : (E O E') [V' / V] = (E [V' / V]) O (E' [V' / V]) .  
 
-
   ceq [lambda1] : 
-  lambda(V'', E) [V' / V] = lambda(V'', E [V' / V])
+  (lambda V'' . E) [V' / V] = lambda V'' . (E [V' / V])
     if V'' =/= V' /\ V'' =/= V . 
 
   ceq [lambda2] : 
-    lambda(V, E) [V / V'] = lambda(V'', E [V'' / V]) [V / V']
+    (lambda V . E) [V / V'] = (lambda V'' . (E [V'' / V])) [V / V']
       if V'' := fresh(V, E) .
 
   ceq [lambda3] : 
-    lambda(V, E) [V' / V] = lambda(V'', E [V'' / V]) [V' / V]
+    (lambda V . E) [V' / V] = (lambda V'' . (E [V'' / V])) [V' / V]
       if V'' := fresh(V, E) .
 
 
@@ -58,8 +67,8 @@ fmod EXP is
 
   eq [next1] : next(I) = 0 .
   eq [next2] : next(v(N)) = s(N) .
-  ceq [next3] : next(lambda(v(N), E)) = N + 1 if N >= next(E) .
-  ceq [next4] : next(lambda(v(N), E)) = next(E) if N < next(E) .
+  ceq [next3] : next(lambda v(N) . E) = N + 1 if N >= next(E) .
+  ceq [next4] : next(lambda v(N) . E) = next(E) if N < next(E) .
   ceq [next5] : next(E v(N)) = s(N) if N >= next(E) .
   ceq [next6] : next(E v(N)) = next(E) if N < next(E) .
   ceq [next7] : next(E O E') = next(E) if next(E) >= next(E') .
