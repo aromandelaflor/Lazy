@@ -62,7 +62,6 @@ mod SEMANTIC is
 
       lambda v(0) . (let v(3) := v(0) in v(3))
 
-    ) in ((v(2) v(0)) +. (v(2) v(1))) > .
+    ) in ((v(2) v(1)) +. (v(2) v(0))) > . 
 
-    ***) in (v(2) v(1)) > .
 endm

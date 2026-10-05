@@ -16,6 +16,7 @@ fmod HEAP is
   vars E E' : Exp .
   vars I I' : Int .
   vars A : Assign .
+  vars N : Nat .
 
   *** We are not going to include an operation for erasing elements
   *** at the moment
@@ -32,9 +33,18 @@ fmod HEAP is
   eq (H [V := E]) [V |-> E'] = H [V := E'] .
   eq H [V |-> E] = H [owise] .
 
+  op next : Heap -> Nat .
+  op fresh : Heap -> Var .
+
+  eq next(emptyHeap) = 0 .
+  eq next(errorHeap) = 0 .
+  eq next([v(N) := E] H) = max(s(N), next(H)) .
+  eq fresh(H) = v(next(H)) .
+
   op bind : Heap Assign -> Heap .
 
   eq bind(H, V := E) = H [V := E] .
+
   eq bind(H, ((V := E) , A)) = bind(H [V := E], A) .
  
 

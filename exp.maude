@@ -28,11 +28,13 @@ fmod EXP is
 
   *** Substitution
 
-  op _[_/_] : Exp Var Var -> Exp .
+  op _[_/_] : Code Var Var -> Code .
 
   eq [int] : I [V' / V] = I .
   eq [var1] : V [V' / V] = V' .
-  eq [var2] : V'' [V' / V] = V'' .
+  eq [var2] : V'' [V' / V] = V'' [owise] .
+
+  eq [nullAssign] : nullAssign [V' / V] = nullAssign .
 
   eq [assign1] : 
     (V := E) [V' / V''] = (V [V' / V'']) := (E [V' / V'']) .
@@ -40,13 +42,18 @@ fmod EXP is
   eq [assign2] : 
     (A , A') [V / V'] = (A [V / V']) , (A' [V / V']) .
 
-  eq [let1] : 
-    (let A in E) [V / V'] = let (A [V / V']) in (E [V / V']) .
+  ceq [let-capture] : 
+    (let ((V' := E) , A) in E') [V' / V] = 
+      (let (((V' := E) , A) [V'' / V']) in (E' [V'' / V'])) [V' / V]
+      if V'' := fresh(V', (let ((V' := E) , A) in E') V) .
 
-  eq [app1] : (E V) [V / V'] = (E [V / V']) . 
-  eq [app2] : (E V') [V / V'] = (E [V / V']) V' .
-  ceq [app3] : (E V'') [V / V'] = (E [V / V']) V''
-    if V'' =/= V' /\ V'' =/= V . 
+  eq [let-shadow] : 
+    (let ((V := E) , A) in E') [V' / V] = let ((V := E) , A) in E' [owise] .
+
+  eq [let-dist] : 
+    (let A in E) [V' / V] = let (A [V' / V]) in (E [V' / V]) [owise] .
+
+  eq [app] : (E V) [V' / V''] = (E [V' / V'']) (V [V' / V'']) . 
 
   eq [comp] : (E O E') [V' / V] = (E [V' / V]) O (E' [V' / V]) .  
 
@@ -56,45 +63,34 @@ fmod EXP is
 
   ceq [lambda2] : 
     (lambda V . E) [V / V'] = (lambda V'' . (E [V'' / V])) [V / V']
-      if V'' := fresh(V, E) .
+      if V'' := fresh(V, E V') .
 
-  ceq [lambda3] : 
-    (lambda V . E) [V' / V] = (lambda V'' . (E [V'' / V])) [V' / V]
-      if V'' := fresh(V, E) .
+  eq [lambda3] : 
+    (lambda V . E) [V' / V] = lambda V . E .
 
 
   op next : Code -> Nat .
 
-  eq [next1] : next(I) = 0 .
-  eq [next2] : next(v(N)) = s(N) .
-  ceq [next3] : next(lambda v(N) . E) = N + 1 if N >= next(E) .
-  ceq [next4] : next(lambda v(N) . E) = next(E) if N < next(E) .
-  ceq [next5] : next(E v(N)) = s(N) if N >= next(E) .
-  ceq [next6] : next(E v(N)) = next(E) if N < next(E) .
-  ceq [next7] : next(E O E') = next(E) if next(E) >= next(E') .
-  ceq [next8] : next(E O E') = next(E') if next(E) < next(E') .
-  ceq [next9] : next(let A in E) = next(A) if next(A) >= next(E) .
-  ceq [next10] : next(let A in E) = next(E) if next(A) < next(E) .  
+  eq [next-int] : next(I) = 0 .
 
-  ceq [next11] : next(v(N) := E) = N'
-    if N' := next(v(N)) /\ N' >= next(E) .
+  eq [next-var] : next(v(N)) = s(N) .
 
-  ceq [next12] : next(v(N) := E) = N'
-    if N' := next(E) /\ N' > next(v(N)) .
+  eq [next-lambda] : next(lambda V . E) = max(next(V), next(E)) .
 
-  ceq [next12] : next(v(N) := E , A) = N'
-    if N' := next(v(N)) /\ N' >= next(A) .
+  eq [next-app] : next(E V) = max(next(E), next(V)) .
 
-  ceq [next13] : next(v(N) := I , A) = N' 
-    if N' := next(A) /\ next(v(N)) < N' .
- 
+  eq [next-comp] : next(E O E') = max(next(E), next(E')) .
+  
+  eq [next-let] : next(let A in E) = max(next(A), next(E)) .
+
+  eq [next-nullAssign] : next(nullAssign) = 0 .
+
+  eq [next-assign1] : next(v(N) := E) = max(next(v(N)), next(E)) .
+
+  eq [next-assign2] : next((v(N) := E) , A) = max(next(v(N) := E), next(A)) [owise] . 
 
   op fresh : Var Code -> Var .
 
-  ceq [fresh1] : fresh(v(N), E) = v(s(N))
-    if N >= next(E) .
-
-  ceq [fresh2] : fresh(v(N), E) = v(next(E)) 
-    if N < next(E) .
+  eq [fresh] : fresh(V, E) = v(max(next(V), next(E))) .
   
 endfm
