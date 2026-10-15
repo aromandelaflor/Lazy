@@ -7,11 +7,11 @@ fmod HEAP is
   sort Heap .
   
   op emptyHeap : -> Heap [ctor] .
-  op errorHeap : -> Heap [ctor] .
   op [_:=_] : Var Exp -> Heap [ctor] .
-  op __ : Heap Heap -> Heap [ctor assoc comm id: emptyHeap] .
+  op __ : Heap Heap ~> Heap [ctor assoc comm id: emptyHeap] .
 
   vars H : Heap .
+  vars K : [Heap] .
   vars V : Var .
   vars E E' : Exp .
   vars I I' : Int .
@@ -21,8 +21,13 @@ fmod HEAP is
   *** We are not going to include an operation for erasing elements
   *** at the moment
 
-  eq H [V := E] [V := E'] = errorHeap .
-  eq errorHeap H [V := E] = errorHeap .
+  op repeated : [Heap] -> Bool .
+  
+  eq repeated(K [V := E] [V := E']) = true .
+  eq repeated(K) = false [owise] .
+
+  cmb K : Heap 
+    if not repeated(K) .
 
   *** Consult a binding (not defined when the variable does not exist)
   ***op fetch : Heap Var ~> Exp .
@@ -37,7 +42,6 @@ fmod HEAP is
   op fresh : Heap -> Var .
 
   eq next(emptyHeap) = 0 .
-  eq next(errorHeap) = 0 .
   eq next([v(N) := E] H) = max(s(N), next(H)) .
   eq fresh(H) = v(next(H)) .
 
