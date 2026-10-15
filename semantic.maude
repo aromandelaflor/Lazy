@@ -8,23 +8,28 @@ mod SEMANTIC is
 
   op <_,_> : Heap Exp -> Conf [ctor] .
   op exec : Exp -> Conf .
-
+  op bindLet : Heap Assign Exp -> Conf .
 
   vars H H' H'' : Heap .
   vars V V' : Var .
   vars E E' : Exp .
   vars I I' : Int .
   vars A : Assign .
-  vars F : NormalForm . 
+  vars F F' : NormalForm . 
   vars N : Nat .
+  vars M : Map .
   
   ceq [exec] : 
     exec(E) = < emptyHeap, E' >
       if < E' , N > := norm(E, 0) .
 
+  ceq [bindLet] : 
+    bindLet(H, A, E) = < bind(H, rename(A, M)) , updateExp(E, M) >
+      if M := buildMap(A, next(H)) .
+
   crl [var] : 
-    < H [V := E] , V > => < H' [V := F] , F >
-    if < H , E > => < H' , F > .
+    < H [V := E] , V > => < H' [V |-> F] , F >
+      if < H [V := blackhole] , E > => < H' , F > .
 
   crl [app] :
     < H , E V > => < H'' , F >
@@ -33,7 +38,7 @@ mod SEMANTIC is
 
   crl [let] : 
     < H , let A in E > => < H' , F > 
-    if < bind(H, A) , E > => < H' , F > .
+      if bindLet(H, A, E) => < H' , F > .
 
   crl [sum] : 
     < H , E +. E' > => < H'' , I + I' >
@@ -62,6 +67,6 @@ mod SEMANTIC is
 
       lambda v(0) . (let v(3) := v(0) in v(3))
 
-    ) in ((v(2) v(1)) +. (v(2) v(0))) > . 
+    ) in ((v(2) v(0)) +. (v(2) v(1))) > . 
 
 endm

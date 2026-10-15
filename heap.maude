@@ -4,19 +4,24 @@ fmod HEAP is
   pr EXP .
   pr INT .
 
-  sort Heap .
+  sort Heap Map .
   
   op emptyHeap : -> Heap [ctor] .
   op [_:=_] : Var Exp -> Heap [ctor] .
   op __ : Heap Heap ~> Heap [ctor assoc comm id: emptyHeap] .
 
+  op emptyMap : -> Map [ctor] .
+  op <_|->_> : Var Var -> Map [ctor] .
+  op __ : Map Map -> Map [ctor assoc comm id: emptyMap] .
+
   vars H : Heap .
   vars K : [Heap] .
-  vars V : Var .
+  vars V V' : Var .
   vars E E' : Exp .
   vars I I' : Int .
   vars A : Assign .
-  vars N : Nat .
+  vars N N' : Nat .
+  vars M : Map .
 
   *** We are not going to include an operation for erasing elements
   *** at the moment
@@ -38,18 +43,41 @@ fmod HEAP is
   eq (H [V := E]) [V |-> E'] = H [V := E'] .
   eq H [V |-> E] = H [owise] .
 
+  op top : Heap -> Nat .
   op next : Heap -> Nat .
-  op fresh : Heap -> Var .
 
-  eq next(emptyHeap) = 0 .
-  eq next([v(N) := E] H) = max(s(N), next(H)) .
-  eq fresh(H) = v(next(H)) .
+  eq top(emptyHeap) = 0 .
+  eq top([v(N) := E] H) = max(N, top(H)) .
+  eq next(H) = s(top(H)) .
+
+  op buildMap : Assign Nat -> Map .
+  
+  eq buildMap(V := E, N) = < V |-> v(N) > .
+  eq buildMap(((V := E) , A), N) = < V |-> v(N) > buildMap(A, s(N)) .
+
+
+  op rename : Assign Map -> Assign .
+  op updateExp : Exp Map -> Exp .
+
+  eq updateExp(E, < V |-> V' > M) = updateExp(E [V' / V], M) .
+  eq updateExp(E, M) = E [owise] .
+
+  eq rename(V := E , < V |-> V' > M) = V' := updateExp(E, M) .
+  eq rename(((V := E) , A), < V |-> V' > M) = (V' := updateExp(E, M)) , rename(A, < V |-> V' > M) .
+
 
   op bind : Heap Assign -> Heap .
 
   eq bind(H, V := E) = H [V := E] .
-
   eq bind(H, ((V := E) , A)) = bind(H [V := E], A) .
+
+
+  op testAssign : -> Assign .
+
+  eq testAssign = (v(0) := (v(1) +. 2)) , (v(1) := v(0)) .
+
+  op testHeap : -> Heap .
+  eq testHeap = [v(5) := 12] .
  
 
 endfm

@@ -12,6 +12,8 @@ fmod EXP is
   op _:=_ : Var Exp -> Assign [ctor] .
   op _,_ : Assign Assign -> Assign [assoc comm ctor id: nullAssign] . 
 
+  op blackhole : -> Exp [ctor] .
+
   op lambda_._ : Var Exp -> LambdaA [ctor] .
   op __ : Exp Exp -> Exp [ctor] .
   op let_in_ : Assign Exp -> Exp [ctor] .
